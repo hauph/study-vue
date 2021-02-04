@@ -21,7 +21,6 @@
 <script>
 import ToDoItem from "./components/ToDoItem.vue";
 import ToDoForm from "./components/ToDoForm";
-import uniqueId from "lodash.uniqueid";
 import "./App.css";
 
 export default {
@@ -30,27 +29,9 @@ export default {
     ToDoItem,
     ToDoForm,
   },
-  data() {
-    return {
-      ToDoItems: [
-        { id: uniqueId("todo-"), label: "Learn Vue", done: false },
-        {
-          id: uniqueId("todo-"),
-          label: "Create a Vue project with the CLI",
-          done: true,
-        },
-        { id: uniqueId("todo-"), label: "Have fun", done: true },
-        { id: uniqueId("todo-"), label: "Create a to-do list", done: false },
-      ],
-    };
-  },
   methods: {
     addToDo(toDoLabel) {
-      this.ToDoItems.push({
-        id: uniqueId("todo-"),
-        label: toDoLabel,
-        done: false,
-      });
+      this.$store.commit('addToDo', toDoLabel)
     },
     updateDoneStatus(toDoId) {
       const toDoToUpdate = this.ToDoItems.find((item) => item.id === toDoId);
@@ -58,12 +39,11 @@ export default {
     },
     deleteToDo(toDoId) {
       const itemIndex = this.ToDoItems.findIndex(item => item.id === toDoId);
-      this.ToDoItems.splice(itemIndex, 1);
+      this.$store.commit('deleteToDo', itemIndex);
       this.$refs.listSummary.focus();
     },
     editToDo(toDoId, newLabel) {
-      const toDoToEdit = this.ToDoItems.find(item => item.id === toDoId);
-      toDoToEdit.label = newLabel;
+      this.$store.commit('editToDo', {toDoId, newLabel});
     }
   },
   computed: {
@@ -72,6 +52,9 @@ export default {
         .length;
       return `${numberFinishedItems} out of ${this.ToDoItems.length} items completed`;
     },
+    ToDoItems() {
+      return this.$store.state.ToDoItems;
+    }
   },
 };
 </script>
